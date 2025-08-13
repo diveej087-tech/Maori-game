@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Kupu Match – Māori Word Game</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #f0f8ff;
+      text-align: center;
+      padding: 20px;
+    }
+    h1 {
+      color: #006400;
+    }
+    .card {
+      display: inline-block;
+      background: #fff;
+      border: 2px solid #006400;
+      border-radius: 10px;
+      padding: 15px;
+      margin: 10px;
+      cursor: pointer;
+      width: 120px;
+      height: 60px;
+      font-size: 18px;
+    }
+    .matched {
+      background: #90ee90;
+      border-color: #228b22;
+      cursor: default;
+    }
+  </style>
+</head>
+<body>
+  <h1>Kupu Match</h1>
+  <p>Match the Māori word with its English meaning!</p>
+  <div id="game"></div>
+  <p id="message"></p>
+
+  <script>
+    const pairs = [
+      { maori: "Awa", english: "River" },
+      { maori: "Maunga", english: "Mountain" },
+      { maori: "Moana", english: "Ocean" },
+      { maori: "Ngahere", english: "Forest" },
+      { maori: "Whānau", english: "Family" }
+    ];
+
+    let cards = [];
+    pairs.forEach(pair => {
+      cards.push({ text: pair.maori, match: pair.english });
+      cards.push({ text: pair.english, match: pair.maori });
+    });
+
+    cards = cards.sort(() => Math.random() - 0.5);
+
+    const gameDiv = document.getElementById("game");
+    let selected = [];
+    let matched = [];
+
+    cards.forEach((card, index) => {
+      const div = document.createElement("div");
+      div.className = "card";
+      div.textContent = card.text;
+      div.dataset.match = card.match;
+      div.dataset.index = index;
+      div.onclick = () => selectCard(div);
+      gameDiv.appendChild(div);
+    });
+
+    function selectCard(card) {
+      if (card.classList.contains("matched") || selected.includes(card)) return;
+      selected.push(card);
+      card.style.background = "#e0ffe0";
+
+      if (selected.length === 2) {
+        const [first, second] = selected;
+        if (first.dataset.match === second.textContent) {
+          first.classList.add("matched");
+          second.classList.add("matched");
+          matched.push(first, second);
+          document.getElementById("message").textContent = "Ka pai! You found a match!";
+        } else {
+          document.getElementById("message").textContent = "Try again!";
+          setTimeout(() => {
+            first.style.background = "#fff";
+            second.style.background = "#fff";
+          }, 800);
+        }
+        selected = [];
+      }
+
+      if (matched.length === cards.length) {
+        document.getElementById("message").textContent = "Tino pai! You matched all the kupu!";
+      }
+    }
+  </script>
+</body>
+</html>
